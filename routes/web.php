@@ -14,14 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::redirect('/', '/home');
+Route::redirect('/', '/home');
 
-
-
-
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('/home', function () {
     return view('home');
