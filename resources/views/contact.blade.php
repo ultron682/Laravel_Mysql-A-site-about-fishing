@@ -375,3 +375,130 @@
         }
     </style>
 @endsection
+
+
+
+@section('scripts')
+    @parent
+    <script>
+// lab 8 pdf - walidacja formularzy przez js
+function getPoleIf(pole_id, obiektRegex) {
+    //Funkcja sprawdza czy wartość wprowadzona do pola tekstowego
+    //pasuje do wzorca zdefiniowanego za pomocą wyrażenia regularnego
+    //Parametry funkcji:
+    //pole_id - id sprawdzanego pola tekstowego
+    //obiektRegex - wyrażenie regularne
+    //---------------------------------
+    var obiektPole = document.getElementById(pole_id); // odnajduje dany element z formularza
+    if (!obiektRegex.test(obiektPole.value))
+        // uruchamia test regexa
+        return undefined; // jesli wzorzec nie pasuje wtedy zwraca undefined
+    else return obiektPole.value; // w przeciwnym wypadku zwraca wartosc danego pola
+}
+
+// Funkcja pobierająca zaznaczone pola typu checkbox
+function getChekboxes(input_type) {
+    inputs = []; // Tablica przechowująca wartości zaznaczonych pól
+    var inputElements = document.getElementsByName(input_type); // Pobierz elementy o nazwie zgodnej z parametrem input_type
+
+    // Przeiteruj przez wszystkie elementy
+    for (var i = 0; i < inputElements.length; ++i) {
+        // Sprawdź, czy dany element jest zaznaczony
+        if (inputElements[i].checked) {
+            // Jeżeli jest zaznaczony, dodaj jego wartość do tablicy inputs
+            inputs.push(inputElements[i].value);
+        }
+    }
+
+    // Sprawdź, czy tablica inputs jest pusta
+    if (inputs.length == 0) {
+        // Jeżeli jest pusta, zwróć wartość undefined
+        return undefined;
+    } else {
+        // W przeciwnym razie, zwróć tablicę inputs
+        return inputs;
+    }
+}
+
+// Funkcja pobierająca zaznaczone pola typu radio
+function getRadio(radio_tapok) {
+    var radios = document.getElementsByName(radio_tapok);
+    for (var i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+            return radios[i].value;
+        }
+    }
+    return undefined;
+}
+
+function checkForm() {
+    // wzorce regularne dla poszczególnych pól formularza
+    obiektNazw = /^[a-zA-Z]{2,20}$/;
+    obiektemail =
+        /^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/;
+    obiektWiek = /^[1-9][0-9]{1,2}$/;
+    obiektNumer = /^[0-9]{9}$/;
+
+    // pobranie wartości pól formularza
+    imie = getPoleIf("imie", obiektNazw);
+    nazw = getPoleIf("naz", obiektNazw);
+    wiek = getPoleIf("wiek", obiektWiek);
+    panstwo = document.getElementById("panstwo").value;
+    telefon = getPoleIf("telefon", obiektNumer);
+    email = getPoleIf("email", obiektemail);
+    uwagi = document.getElementById("uwagi").value;
+    zainteresowania = getChekboxes("zainteresowanie");
+
+    // utworzenie tablicy z wartościami pól formularza
+    pola = [imie, nazw, wiek, panstwo, telefon, email];
+
+    anyError = false;
+
+    // iteracja po polach formularza i weryfikacja poprawności ich wartości
+    for (i = 0; i < pola.length; i++) {
+        if (pola[i] == undefined) {
+            // jeśli wartość pola jest niepoprawna, wyświetl komunikat o błędzie
+            document.getElementsByClassName("error")[i].style.display = "block";
+            anyError = true;
+        } else {
+            // w przeciwnym razie ukryj komunikat o błędzie
+            document.getElementsByClassName("error")[i].style.display = "none";
+        }
+    }
+
+    return anyError;
+}
+
+function submitForm(thisForm) {
+    // jeśli nie ma żadnych błędów, wyświetl potwierdzenie danych z formularza
+    anyError = checkForm();
+
+    if (anyError == false) {
+        // wyświetl okno dialogowe z potwierdzeniem danych z formularza
+
+        const formattedFormData = new FormData(thisForm);
+        formattedFormData.append("submit", "submit");
+        //  await fetch('handle_form.php',{
+        //     method: 'POST',
+        //     body: formattedFormData
+        // });
+
+        fetch("./klasy/ReportsManager.php", {
+            method: "POST",
+            // headers: {"Content-type": "application/x-www-form-urlencoded; charset=UTF-8"},
+            body: formattedFormData,
+        })
+            .then((response) => response.text())
+            .then((datas) => {
+                // pobrana podstrona zostanie wstrzyknięta do głównego kontenera przechowującego stronę
+                //pageContainer.innerHTML = datas;
+                console.log(datas);
+            });
+
+        return true;
+    } else {
+        return false;
+    }
+}
+</script>
+@endsection

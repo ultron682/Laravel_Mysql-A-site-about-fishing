@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ToolsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,18 +24,15 @@ Route::get('/', function () {
 Route::get('/home', function () {
     return view('home');
 });
-Route::get('/tools', function () {
-    return view('tools');
-});
+Route::get('/tools', [ToolsController::class, 'index'])->name('Tools');
+
 Route::get('/faq', function () {
     return view('faq');
 });
 Route::get('/aboutus', function () {
     return view('aboutus');
 });
-Route::get('/contact', function () {
-    return view('contact');
-});
+Route::get('/contact', [ContactController::class, 'index'])->name('Contact');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -45,4 +44,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

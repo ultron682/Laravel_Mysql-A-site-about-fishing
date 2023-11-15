@@ -429,14 +429,8 @@
     <link rel="icon" type="image/x-icon" href="./img/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="stylesheet" type="text/css" href="./CSS/normalize.css" />
-
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <!-- lokalne skrypty, wszystkie funkcje zawarte są w tych dwóch plikach -->
-    <script src="./JS/main.js"></script>
-    <script src="./JS/Storage.js"></script>
 
     <!-- Bootstrap style css -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" />
@@ -447,8 +441,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
     <!-- Lightbox -->
-    <link href="./CSS/lightbox.css" rel="stylesheet" />
-    <script src="./JS/lightbox.js"></script>
+    <link href="./css/lightbox.css" rel="stylesheet" />
+    <script src="./js/lightbox.js"></script>
     <!-- Wybranie odpowiednich opcji dla lightbox'a (podstrona o polecanych narzędziach) -->
     <script>
         lightbox.option({
@@ -459,13 +453,11 @@
             alwaysShowNavOnTouchDevices: true,
         });
     </script>
+    @yield('scripts')
 </head>
 
 <body>
-
-
-
-    {{-- @include('layouts.navigation') --}}
+    @include('layouts.navigation')
 
     <!-- Page Heading -->
     @if (isset($header))

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tool;
 use Illuminate\Http\Request;
 
 class ToolsController extends Controller
@@ -11,7 +12,9 @@ class ToolsController extends Controller
      */
     public function index()
     {
-        return view('tools');
+        $tools = Tool::orderBy('id', 'asc')->get();
+        //$tools = Tool::all();
+        return view('tools', ['tools' => $tools]);
     }
 
     /**
