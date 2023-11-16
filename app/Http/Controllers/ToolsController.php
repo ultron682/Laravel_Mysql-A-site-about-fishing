@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tool;
+
 use Illuminate\Http\Request;
 
 class ToolsController extends Controller
@@ -22,7 +23,8 @@ class ToolsController extends Controller
      */
     public function create()
     {
-        //
+        $tool = new Tool();
+        return view('toolsForm', ['tool' => $tool]);
     }
 
     /**
@@ -30,7 +32,28 @@ class ToolsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required|min:10|max:255',
+            // 'src' => 'required|min:10|max:255',
+        ]);
+
+        if (\Auth::user() == null) {
+            return view('tools'); // jesli uzytkownik nie jest zalogowany
+        }
+
+        if ($request->hasFile('src')) {
+            $avatar = $request->file('src')->store(options: 'toolsImgs');
+        }
+
+        $tool = new Tool();
+        // $tool->user_id = \Auth::user()->id; // id zalogowanego
+        $tool->name = $request->name; // nazwa pola z walidatora
+        $tool->src = $avatar; // nazwa pola z walidatora
+
+        if ($tool->save()) {
+            return redirect('tools');
+        }
+        return view('tools');
     }
 
     /**
@@ -46,7 +69,16 @@ class ToolsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $tool = Tool::find($id);
+        //Sprawdzenie czy użytkownik jest autorem komentarza
+       // if (Auth::user()->id != 0) {
+            // return back()->with([
+            //     'success' => false,
+            //     'message_type' => 'danger',
+            //     'message' => 'Nie posiadasz uprawnień do przeprowadzenia tej operacji.'
+            // ]);
+       // }
+        return view('toolsEditForm', ['tool' => $tool]);
     }
 
     /**
@@ -54,7 +86,21 @@ class ToolsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $tool = Tool::find($id);
+        //Sprawdzenie czy użytkownik jest autorem komentarza
+        // if (\Auth::user()->id != $tool->user_id) {
+        //     return back()->with([
+        //         'success' => false,
+        //         'message type' => 'danger',
+        //         'message' => 'Nie posiadasz uprawnień do przeprowadzenia tej operacji.'
+        //     ]);
+        // }
+        $tool->name = $request->name;
+        $tool->src = $request->src;
+        if ($tool->save()) {
+            return redirect()->route('tools');
+        }
+        return "Wystąpił błąd.";
     }
 
     /**
@@ -62,6 +108,16 @@ class ToolsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        //Znajdz komentarz o danych id:
+        $comment = Tool::find($id);
+        //Sprawdz czy użytkownik jest autorem komentarza:
+
+        // if (\Auth::user()->id != $comment->user_id) {
+        //     return back();
+        // }
+        if ($comment->delete()) {
+            return redirect()->route('tools');
+        } else
+            return back();
     }
 }

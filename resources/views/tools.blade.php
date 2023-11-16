@@ -9,16 +9,31 @@
                     <b>Zaloguj się aby edytować dostępne narzędzia</b>
                 </div>
             @endguest
+            <!-- Page Heading -->
+            @auth
+                <header class="bg-white dark:bg-gray-800 shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        <a href="{{ route('create') }}" class="btn btn-success btn-xs" style="height: 44px;"
+                        title="Dodaj nowe narzędzie">Dodaj nowe narzędzie</a>
+                    </div>
+                </header>
+            @endauth
             <div class="card-group" id="eleContainer">
                 <!-- W tym miejscu za pomocą funckji loadTools() zostaną wygenerowane dynamicznie karty polecanych narzędzi-->
                 <!-- karty mają gotowe style z bootstrapa -->
                 @foreach ($tools as $tool)
                     <a data-lightbox="Galeria" data-title="{{ $tool->name }}" href="{{ $tool->src }}" class="card"
-                        style="min-width: 18rem;"><img src="{{ $tool->src }}" alt="{{ $tool->name }}"
-                            class="card-img-top">
+                        style="min-width: 18rem;">
+                        <img src="{{  Storage::disk('tools')->url() }}" alt="{{ $tool->name }}" class="card-img-top">
                         <div class="card-body">
                             <h4 class="card-title">{{ $tool->name }}</h4>
                         </div>
+                        @auth
+                            <a href="{{ route('edit', $tool) }}" class="btn btn-success btn-xs" style="height: 44px;"
+                                title="Edytuj">Edytuj</a>
+                            <a href="{{ route('delete', $tool->id) }}" class="btn btn-danger btn-xs" style="height: 44px;"
+                                onclick="return confirm('Jesteś pewien?')" title="Skasuj">Usuń</a>
+                        @endauth
                     </a>
                 @endforeach
             </div>

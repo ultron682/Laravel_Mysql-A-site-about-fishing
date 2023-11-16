@@ -456,17 +456,9 @@
     @yield('scripts')
 </head>
 
-<body>
-    @include('layouts.navigation')
+<body class="antialiased">
+    {{-- @include('layouts.navigation') --}}
 
-    <!-- Page Heading -->
-    @if (isset($header))
-        <header class="bg-white dark:bg-gray-800 shadow">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                {{ $header }}
-            </div>
-        </header>
-    @endif
     <!-- Sekcja nagłówka strony -->
     <header class="header">
         <p class="title">Wędkarz GURU</p>
@@ -505,6 +497,28 @@
                         <p>KONTAKT</p>
                     </a>
                 </li>
+                @if (Route::has('login'))
+                    <li>
+                        @auth
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+
+                                <a :href="route('logout')"
+                                    onclick="event.preventDefault();
+                                            this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </a>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}">Log in</a>
+                            {{-- uzytkonwik moze istniec tylko jeden czyli admin --}}
+                            {{-- @if (Route::has('register'))
+                            <a href="{{ route('register') }}"
+                                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Register</a>
+                        @endif --}}
+                        @endauth
+                    </li>
+                @endif
             </ul>
         </nav>
     </header>

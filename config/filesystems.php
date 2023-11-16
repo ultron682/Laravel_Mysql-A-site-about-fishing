@@ -56,6 +56,13 @@ return [
             'throw' => false,
         ],
 
+        'toolsImgs' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/toolsImgs'),
+            'url' => env('APP_URL').'/storage/toolsImgs',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
     ],
 
     /*
