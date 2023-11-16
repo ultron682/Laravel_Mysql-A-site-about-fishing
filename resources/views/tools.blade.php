@@ -22,9 +22,9 @@
                 <!-- W tym miejscu za pomocą funckji loadTools() zostaną wygenerowane dynamicznie karty polecanych narzędzi-->
                 <!-- karty mają gotowe style z bootstrapa -->
                 @foreach ($tools as $tool)
-                    <a data-lightbox="Galeria" data-title="{{ $tool->name }}" href="{{ $tool->src }}" class="card"
+                    <a data-lightbox="Galeria" data-title="{{ $tool->name }}" href="{{ Storage::disk('toolsImgs')->url($tool->src) }}" class="card"
                         style="min-width: 18rem;">
-                        <img src="{{  Storage::disk('tools')->url() }}" alt="{{ $tool->name }}" class="card-img-top">
+                        <img src="{{ Storage::disk('toolsImgs')->url($tool->src) }}" alt="{{ $tool->name }}" class="card-img-top">
                         <div class="card-body">
                             <h4 class="card-title">{{ $tool->name }}</h4>
                         </div>

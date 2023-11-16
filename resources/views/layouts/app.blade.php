@@ -506,11 +506,11 @@
                                 <a :href="route('logout')"
                                     onclick="event.preventDefault();
                                             this.closest('form').submit();">
-                                    {{ __('Log Out') }}
+                                    Wyloguj
                                 </a>
                             </form>
                         @else
-                            <a href="{{ route('login') }}">Log in</a>
+                            <a href="{{ route('login') }}">Zaloguj się</a>
                             {{-- uzytkonwik moze istniec tylko jeden czyli admin --}}
                             {{-- @if (Route::has('register'))
                             <a href="{{ route('register') }}"

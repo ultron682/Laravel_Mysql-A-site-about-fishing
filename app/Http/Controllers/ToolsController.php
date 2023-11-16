@@ -33,8 +33,8 @@ class ToolsController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|min:10|max:255',
-            // 'src' => 'required|min:10|max:255',
+            'name' => 'required|min:3|max:30',
+            'src' => ['nullable', 'image'],
         ]);
 
         if (\Auth::user() == null) {
@@ -42,13 +42,13 @@ class ToolsController extends Controller
         }
 
         if ($request->hasFile('src')) {
-            $avatar = $request->file('src')->store(options: 'toolsImgs');
+            $src = $request->file('src')->store(options: 'toolsImgs');
         }
 
         $tool = new Tool();
         // $tool->user_id = \Auth::user()->id; // id zalogowanego
         $tool->name = $request->name; // nazwa pola z walidatora
-        $tool->src = $avatar; // nazwa pola z walidatora
+        $tool->src = $src ?? null; // nazwa pola z walidatora
 
         if ($tool->save()) {
             return redirect('tools');
