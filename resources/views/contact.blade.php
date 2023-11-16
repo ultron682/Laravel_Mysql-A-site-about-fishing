@@ -434,8 +434,7 @@ function getRadio(radio_tapok) {
 function checkForm() {
     // wzorce regularne dla poszczególnych pól formularza
     obiektNazw = /^[a-zA-Z]{2,20}$/;
-    obiektemail =
-        /^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/;
+    obiektemail = /^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/;
     obiektWiek = /^[1-9][0-9]{1,2}$/;
     obiektNumer = /^[0-9]{9}$/;
 
