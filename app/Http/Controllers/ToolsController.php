@@ -57,27 +57,19 @@ class ToolsController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
         $tool = Tool::find($id);
         //Sprawdzenie czy użytkownik jest autorem komentarza
-       // if (Auth::user()->id != 0) {
-            // return back()->with([
-            //     'success' => false,
-            //     'message_type' => 'danger',
-            //     'message' => 'Nie posiadasz uprawnień do przeprowadzenia tej operacji.'
-            // ]);
-       // }
+        // if (Auth::user()->id != 0) {
+        // return back()->with([
+        //     'success' => false,
+        //     'message_type' => 'danger',
+        //     'message' => 'Nie posiadasz uprawnień do przeprowadzenia tej operacji.'
+        // ]);
+        // }
         return view('toolsEditForm', ['tool' => $tool]);
     }
 
@@ -96,7 +88,13 @@ class ToolsController extends Controller
         //     ]);
         // }
         $tool->name = $request->name;
-        $tool->src = $request->src;
+
+        if ($request->hasFile('src')) {
+            $tool->src = $request->file('src')->store(options: 'toolsImgs');
+        }
+
+
+
         if ($tool->save()) {
             return redirect()->route('tools');
         }

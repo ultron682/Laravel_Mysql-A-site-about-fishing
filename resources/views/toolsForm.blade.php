@@ -10,7 +10,7 @@
         <div class="box box-primary ">
             <!-- /.box-header -->
             <!-- form start -->
-            <form role="form" action="{{ route('store') }}" id="comment-form" method="post" enctype="multipart/form-data">
+            <form role="form" action="{{ route('tools.store') }}" id="comment-form" method="post" enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <div class="box">
                     <div class="box-body">

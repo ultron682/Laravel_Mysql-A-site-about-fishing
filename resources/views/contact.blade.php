@@ -14,9 +14,17 @@
                     <li>Adres siedziby: Nadbystrzycka 16 Lublin 20-612</li>
                 </ul>
             </div>
+
+            @if (\Session::has('success'))
+                <div>
+                    <h2 style="color: green">Zapisano zgłoszenie!!</h2>
+                </div>
+            @endif
+
             <h2>Formularz zgłoszenia</h2>
-            <form method="post" onsubmit="event.preventDefault();
-            return submitForm(this);">
+            <form role="form" method="post" action="{{ route('contact.store') }}" id="contact-form"
+                enctype="multipart/form-data" onsubmit="return submitForm(this);">
+                {{ csrf_field() }}
                 <h4>Zacznijmy od początku... Czego dotyczy zgłoszenie?</h4>
                 <div class="form-check">
                     <input class="form-check-input" id="fix" type="radio" name="reportType" />
@@ -215,6 +223,46 @@
                     Usuń wersje roboczą
                 </button>
             </div>
+
+            @auth
+            <br><br>
+            <h3>Wszystkie zgłoszenia:</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Imie</th>
+                            <th>Nazwisko</th>
+                            <th>Wiek</th>
+                            <th>Panstwo</th>
+                            <th>Telefon</th>
+                            <th>Email</th>
+                            <th>Uwagi</th>
+                            <th>Zainteresowania</th>
+                            <th>Wysłano o</th>
+                            <th>Usuń</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($contacts as $contact)
+                            <tr>
+                                <td>{{ $contact->id }}</td>
+                                <td>{{ $contact->imie }}</td>
+                                <td>{{ $contact->naz }}</td>
+                                <td>{{ $contact->wiek }}</td>
+                                <td>{{ $contact->panstwo }}</td>
+                                <td>{{ $contact->telefon }}</td>
+                                <td>{{ $contact->email }}</td>
+                                <td>{{ $contact->uwagi }}</td>
+                                <td>{{ $contact->zainteresowania }}</td>
+                                <td>{{ $contact->created_at }}</td>
+                                <td><a href="{{ route('contact.delete', $contact->id) }}" class="btn btn-danger btn-xs" style="height: 44px;"title="Skasuj">Usuń</a></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+            @endauth
         </div>
     </div>
 @endsection
@@ -304,6 +352,7 @@
 
         /* Media query dla szerokości ekranu poniżej 992px */
         @media only screen and (max-width: 992px) {
+
             /* Zmiana układu formularza przycisków na kolumnowy */
             .buttonsForm {
                 flex-direction: column;
@@ -319,6 +368,10 @@
                 flex-direction: column;
             }
         }
+
+        .showSuccess {
+            display: block;
+        }
     </style>
 @endsection
 
@@ -327,123 +380,231 @@
 @section('scripts')
     @parent
     <script>
-// lab 8 pdf - walidacja formularzy przez js
-function getPoleIf(pole_id, obiektRegex) {
-    //Funkcja sprawdza czy wartość wprowadzona do pola tekstowego
-    //pasuje do wzorca zdefiniowanego za pomocą wyrażenia regularnego
-    //Parametry funkcji:
-    //pole_id - id sprawdzanego pola tekstowego
-    //obiektRegex - wyrażenie regularne
-    //---------------------------------
-    var obiektPole = document.getElementById(pole_id); // odnajduje dany element z formularza
-    if (!obiektRegex.test(obiektPole.value))
-        // uruchamia test regexa
-        return undefined; // jesli wzorzec nie pasuje wtedy zwraca undefined
-    else return obiektPole.value; // w przeciwnym wypadku zwraca wartosc danego pola
-}
-
-// Funkcja pobierająca zaznaczone pola typu checkbox
-function getChekboxes(input_type) {
-    inputs = []; // Tablica przechowująca wartości zaznaczonych pól
-    var inputElements = document.getElementsByName(input_type); // Pobierz elementy o nazwie zgodnej z parametrem input_type
-
-    // Przeiteruj przez wszystkie elementy
-    for (var i = 0; i < inputElements.length; ++i) {
-        // Sprawdź, czy dany element jest zaznaczony
-        if (inputElements[i].checked) {
-            // Jeżeli jest zaznaczony, dodaj jego wartość do tablicy inputs
-            inputs.push(inputElements[i].value);
+        // lab 8 pdf - walidacja formularzy przez js
+        function getPoleIf(pole_id, obiektRegex) {
+            //Funkcja sprawdza czy wartość wprowadzona do pola tekstowego
+            //pasuje do wzorca zdefiniowanego za pomocą wyrażenia regularnego
+            //Parametry funkcji:
+            //pole_id - id sprawdzanego pola tekstowego
+            //obiektRegex - wyrażenie regularne
+            //---------------------------------
+            var obiektPole = document.getElementById(pole_id); // odnajduje dany element z formularza
+            if (!obiektRegex.test(obiektPole.value))
+                // uruchamia test regexa
+                return undefined; // jesli wzorzec nie pasuje wtedy zwraca undefined
+            else return obiektPole.value; // w przeciwnym wypadku zwraca wartosc danego pola
         }
-    }
 
-    // Sprawdź, czy tablica inputs jest pusta
-    if (inputs.length == 0) {
-        // Jeżeli jest pusta, zwróć wartość undefined
-        return undefined;
-    } else {
-        // W przeciwnym razie, zwróć tablicę inputs
-        return inputs;
-    }
-}
+        // Funkcja pobierająca zaznaczone pola typu checkbox
+        function getChekboxes(input_type) {
+            inputs = []; // Tablica przechowująca wartości zaznaczonych pól
+            var inputElements = document.getElementsByName(
+                input_type); // Pobierz elementy o nazwie zgodnej z parametrem input_type
 
-// Funkcja pobierająca zaznaczone pola typu radio
-function getRadio(radio_tapok) {
-    var radios = document.getElementsByName(radio_tapok);
-    for (var i = 0; i < radios.length; i++) {
-        if (radios[i].checked) {
-            return radios[i].value;
+            // Przeiteruj przez wszystkie elementy
+            for (var i = 0; i < inputElements.length; ++i) {
+                // Sprawdź, czy dany element jest zaznaczony
+                if (inputElements[i].checked) {
+                    // Jeżeli jest zaznaczony, dodaj jego wartość do tablicy inputs
+                    inputs.push(inputElements[i].value);
+                }
+            }
+
+            // Sprawdź, czy tablica inputs jest pusta
+            if (inputs.length == 0) {
+                // Jeżeli jest pusta, zwróć wartość undefined
+                return undefined;
+            } else {
+                // W przeciwnym razie, zwróć tablicę inputs
+                return inputs;
+            }
         }
-    }
-    return undefined;
-}
 
-function checkForm() {
-    // wzorce regularne dla poszczególnych pól formularza
-    obiektNazw = /^[a-zA-Z]{2,20}$/;
-    obiektemail = /^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/;
-    obiektWiek = /^[1-9][0-9]{1,2}$/;
-    obiektNumer = /^[0-9]{9}$/;
-
-    // pobranie wartości pól formularza
-    imie = getPoleIf("imie", obiektNazw);
-    nazw = getPoleIf("naz", obiektNazw);
-    wiek = getPoleIf("wiek", obiektWiek);
-    panstwo = document.getElementById("panstwo").value;
-    telefon = getPoleIf("telefon", obiektNumer);
-    email = getPoleIf("email", obiektemail);
-    uwagi = document.getElementById("uwagi").value;
-    zainteresowania = getChekboxes("zainteresowanie");
-
-    // utworzenie tablicy z wartościami pól formularza
-    pola = [imie, nazw, wiek, panstwo, telefon, email];
-
-    anyError = false;
-
-    // iteracja po polach formularza i weryfikacja poprawności ich wartości
-    for (i = 0; i < pola.length; i++) {
-        if (pola[i] == undefined) {
-            // jeśli wartość pola jest niepoprawna, wyświetl komunikat o błędzie
-            document.getElementsByClassName("error")[i].style.display = "block";
-            anyError = true;
-        } else {
-            // w przeciwnym razie ukryj komunikat o błędzie
-            document.getElementsByClassName("error")[i].style.display = "none";
+        // Funkcja pobierająca zaznaczone pola typu radio
+        function getRadio(radio_tapok) {
+            var radios = document.getElementsByName(radio_tapok);
+            for (var i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    return radios[i].value;
+                }
+            }
+            return undefined;
         }
-    }
 
-    return anyError;
-}
+        function checkForm() {
+            // wzorce regularne dla poszczególnych pól formularza
+            obiektNazw = /^[\p{L}]{2,20}$/u;
+            obiektemail = /^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/;
+            obiektWiek = /^[1-9][0-9]{1,2}$/;
+            obiektNumer = /^[0-9]{9}$/;
 
-function submitForm(thisForm) {
-    // jeśli nie ma żadnych błędów, wyświetl potwierdzenie danych z formularza
-    anyError = checkForm();
+            // pobranie wartości pól formularza
+            imie = getPoleIf("imie", obiektNazw);
+            nazw = getPoleIf("naz", obiektNazw);
+            wiek = getPoleIf("wiek", obiektWiek);
+            panstwo = document.getElementById("panstwo").value;
+            telefon = getPoleIf("telefon", obiektNumer);
+            email = getPoleIf("email", obiektemail);
+            uwagi = document.getElementById("uwagi").value;
+            zainteresowania = getChekboxes("zainteresowania[]");
 
-    if (anyError == false) {
-        // wyświetl okno dialogowe z potwierdzeniem danych z formularza
+            // utworzenie tablicy z wartościami pól formularza
+            pola = [imie, nazw, wiek, panstwo, telefon, email];
 
-        const formattedFormData = new FormData(thisForm);
-        formattedFormData.append("submit", "submit");
-        //  await fetch('handle_form.php',{
-        //     method: 'POST',
-        //     body: formattedFormData
-        // });
+            anyError = false;
 
-        fetch("./klasy/ReportsManager.php", {
-            method: "POST",
-            // headers: {"Content-type": "application/x-www-form-urlencoded; charset=UTF-8"},
-            body: formattedFormData,
-        })
-            .then((response) => response.text())
-            .then((datas) => {
-                // pobrana podstrona zostanie wstrzyknięta do głównego kontenera przechowującego stronę
-                //pageContainer.innerHTML = datas;
-                console.log(datas);
+            // iteracja po polach formularza i weryfikacja poprawności ich wartości
+            for (i = 0; i < pola.length; i++) {
+                if (pola[i] == undefined) {
+                    // jeśli wartość pola jest niepoprawna, wyświetl komunikat o błędzie
+                    document.getElementsByClassName("error")[i].style.display = "block";
+                    anyError = true;
+                } else {
+                    // w przeciwnym razie ukryj komunikat o błędzie
+                    document.getElementsByClassName("error")[i].style.display = "none";
+                }
+            }
+
+            return anyError;
+        }
+
+        function submitForm(thisForm) {
+            // jeśli nie ma żadnych błędów, wyświetl potwierdzenie danych z formularza
+            anyError = checkForm();
+
+            if (anyError == false) {
+                // wyświetl okno dialogowe z potwierdzeniem danych z formularza
+
+                //const formattedFormData = new FormData(thisForm);
+                //formattedFormData.append("submit", "submit");
+                //  await fetch('handle_form.php',{
+                //     method: 'POST',
+                //     body: formattedFormData
+                // });
+
+                // fetch("./klasy/ReportsManager.php", {
+                //         method: "POST",
+                //         // headers: {"Content-type": "application/x-www-form-urlencoded; charset=UTF-8"},
+                //         body: formattedFormData,
+                //     })
+                //     .then((response) => response.text())
+                //     .then((datas) => {
+                //         // pobrana podstrona zostanie wstrzyknięta do głównego kontenera przechowującego stronę
+                //         //pageContainer.innerHTML = datas;
+                //         console.log(datas);
+                //     });
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        // funkcja jest podpięta pod zdarzenie onchange do pól formularzy żeby na bieżąco sprawdzać zmiany
+        function onFormElementChange() {
+            checkForm();
+        }
+
+        // sprawdza czy jest zapisana jakakolwiek wersja robocza
+        function checkAvailableState() {
+            btnLoad = document.getElementById("btnLoad"); // Pobierz referencję do przycisku o id "btnLoad"
+            btnSave = document.getElementById("btnSave"); // Pobierz referencję do przycisku o id "btnSave"
+            btnClear = document.getElementById("btnClear"); // Pobierz referencję do przycisku o id "btnClear"
+
+            if (localStorage.getItem("wersjaRobocza") === null) {
+                // Jeżeli element "wersjaRobocza" nie istnieje w localStorage
+                btnLoad.style = "display: none;"; // Ukryj przycisk "btnLoad"
+                btnClear.style = "display: none;"; // Ukryj przycisk "btnClear"
+            } else {
+                // W przeciwnym razie (element "wersjaRobocza" istnieje w localStorage)
+                btnLoad.style = "display: block;"; // Wyświetl przycisk "btnLoad"
+                btnClear.style = "display: block;"; // Wyświetl przycisk "btnClear"
+            }
+        }
+
+        // wykonywana wtedy gdy nastąpi odczyt z pamięci przeglądarki żeby sprawdzić czy dane są poprawne(walidacja formularza przez JS)
+        function onDataRead() {
+            checkForm();
+        }
+
+
+        // Funkcja wczytująca dane z Local Storage
+        function loadFromLocalStorage() {
+            var dane = JSON.parse(localStorage.getItem("wersjaRobocza"));
+            var type = document.getElementsByName("reportType");
+
+            // przejrzenie elementów o nazwie reportType i przypisanie id zaznaczonego radiobuttona do obiektu
+            type.forEach((element) => {
+                if (element.id == dane.powod) {
+                    element.checked = true;
+                }
             });
 
-        return true;
-    } else {
-        return false;
-    }
-}
-</script>
+            // przypisanie elementom z formularza odpowiednich wartości
+            document.getElementById("imie").value = dane.imie;
+            document.getElementById("naz").value = dane.naz;
+            document.getElementById("wiek").value = dane.wiek;
+            document.getElementById("panstwo").value = dane.panstwo;
+            document.getElementById("telefon").value = dane.telefon;
+            document.getElementById("email").value = dane.email;
+            document.getElementById("uwagi").value = dane.uwagi;
+
+            var checkBoxes = document.getElementsByName("zainteresowania[]");
+
+            // Zaznaczenie odpowiednich checkboxów na podstawie danych z Local Storage
+            checkBoxes.forEach((element) => {
+                if (dane.zainteresowania.includes(element.value)) element.checked = true;
+            });
+
+            checkAvailableState();
+            onDataRead(); // funkcja z pliku main.js
+        }
+
+        // Funkcja zapisująca dane do Local Storage
+        function saveToLocalStorage() {
+            var dane = {};
+
+            var type = document.getElementsByName("reportType");
+
+            // przejrzenie elementów o nazwie reportType i przypisanie id zaznaczonego radiobuttona do obiektu
+            type.forEach((element) => {
+                if (element.checked) {
+                    dane.powod = element.id;
+                }
+            });
+
+            // Przypisanie wartości pól formularza do obiektu dane
+            dane.imie = document.getElementById("imie").value;
+            dane.naz = document.getElementById("naz").value;
+            dane.wiek = parseInt(document.getElementById("wiek").value);
+            dane.panstwo = document.getElementById("panstwo").value;
+            dane.telefon = document.getElementById("telefon").value;
+            dane.email = document.getElementById("email").value;
+            dane.uwagi = document.getElementById("uwagi").value;
+            dane.zainteresowania = getChekboxes("zainteresowania[]");
+
+            if (isNaN(dane.telefon)) {
+                dane.telefon = 123456789;
+            }
+
+            // Zapisanie obiektu dane do Local Storage w formacie JSON
+            localStorage.setItem("wersjaRobocza", JSON.stringify(dane));
+            console.log(dane);
+            alert("Zapisano wersję roboczą");
+
+            checkAvailableState();
+        }
+
+        // Funkcja usuwająca dane z Local Storage
+        function clearFromLocalStorage() {
+            localStorage.removeItem("wersjaRobocza");
+
+            checkAvailableState();
+        }
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            checkAvailableState();
+        });
+    </script>
 @endsection
