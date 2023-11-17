@@ -215,60 +215,6 @@
                     Usuń wersje roboczą
                 </button>
             </div>
-
-            <form action="mailto:s97677@pollub.edu.pl" method="post">
-                <fieldset style="display: flex; justify-content: space-between; width: 100%">
-                    <legend>Jaka ocena szefie?</legend>
-                    <div class="form-check">
-                        <input class="form-check-input" id="gwiazdki5" type="radio" name="gwiazdki" required
-                            onchange="saveToSessionStorage()" />
-                        <label class="form-check-label" for="fix">5 gwiazdek</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" id="gwiazdki4" type="radio" name="gwiazdki" required
-                            onchange="saveToSessionStorage()" />
-                        <label class="form-check-label" for="fix">4 gwiazdki</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" id="gwiazdki3" type="radio" name="gwiazdki" required
-                            onchange="saveToSessionStorage()" />
-                        <label class="form-check-label" for="fix">3 gwiazdki</label>
-                    </div>
-
-                    <div class="form-check">
-                        <input class="form-check-input" id="gwiazdki2" type="radio" name="gwiazdki" required
-                            onchange="saveToSessionStorage()" />
-                        <label class="form-check-label" for="fix">2 gwiazdki</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" id="gwiazdki1" type="radio" name="gwiazdki" required
-                            onchange="saveToSessionStorage()" />
-                        <label class="form-check-label" for="fix">1 gwiazdka</label>
-                    </div>
-                </fieldset>
-                <fieldset>
-                    <legend>
-                        Napisz co o nas sądzisz? (nie można używać liczb! Wymagane 10-50
-                        znaków)
-                    </legend>
-                    <input type="text" class="form-control" title="Wymagane 10-50 znaków!" pattern="^.{10,50}$"
-                        required placeholder="Tutaj wpisz tekst" id="uwagiDoPoprawy" name="uwagiDoPoprawy"
-                        onchange="saveToSessionStorage()" />
-                </fieldset>
-
-                <div class="buttonsForm">
-                    <button class="btn btn-outline-primary" type="submit">Wyślij</button>
-                </div>
-            </form>
-
-            <div class="buttonsForm">
-                <button class="btn btn-success" type="button" disabled>
-                    Zapisywanie automatyczne w SessionStorage
-                </button>
-                <button class="btn btn-danger" type="button" id="btnClear" onclick="clearFromSessionStorage()">
-                    Usuń sessionStorage
-                </button>
-            </div>
         </div>
     </div>
 @endsection
